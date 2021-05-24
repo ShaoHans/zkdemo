@@ -9,7 +9,7 @@ public class App {
     public static void main(String[] args) throws Exception {
         final CountDownLatch cd = new CountDownLatch(1);
         // 客户端会随机连到一台zkServer上，例如：node01，并建立了session会话，分配一个sessionId；
-        // 加入node01突然宕机，客户端会重新随机连接到另一台zkServer上，并建立session会话，但sessionId不会改变！！！
+        // 假如node01突然宕机，客户端会重新随机连接到另一台zkServer上，并建立session会话，但sessionId不会改变！！！
         final ZooKeeper zk = new ZooKeeper("node01:2181,node02:2181,node03:2181,node04:2181",
                 3000,   // 客户端断开连接后，EPHEMERAL类型的节点生存时间
                 new Watcher() {
@@ -24,7 +24,7 @@ public class App {
                     }
                 });
 
-        cd.await(); // 同步等待
+        cd.await(); // 同步等待，在zk初始化的watcher回调方法中可解除等待
         System.out.println("当前客户端连接到zkServer Cluster的状态：" + zk.getState());
 
         // 创建节点
